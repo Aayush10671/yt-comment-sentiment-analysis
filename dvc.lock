@@ -1,0 +1,112 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data/data_ingestion.py
+    deps:
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: c24168e73774154f976891160521e4c8
+      size: 1872
+    params:
+      params.yaml:
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: e13bcce40396cd334c8a7a334868166a.dir
+      size: 6919701
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data/data_preprocessing.py
+    deps:
+    - path: data/raw/test.csv
+      hash: md5
+      md5: ea97ba82a4a25627bf4ffb52572484ea
+      size: 1348612
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 1bd422dd6d135bced1d6c64a3e84a45d
+      size: 5571089
+    - path: src/data/data_preprocessing.py
+      hash: md5
+      md5: fe87242dfaa06113e8331a6c1e7c0287
+      size: 2354
+    outs:
+    - path: data/interim
+      hash: md5
+      md5: ba42408e7bd1e85685474d6a349ae57e.dir
+      size: 5134850
+      nfiles: 2
+  model_building:
+    cmd: python src/models/model_building.py
+    deps:
+    - path: data/interim/train_processed.csv
+      hash: md5
+      md5: 35027dfda8274bd9356544f2ff358aa4
+      size: 4134324
+    - path: src/models/model_building.py
+      hash: md5
+      md5: 46ffffdefd448cf8dd706d86bd79db95
+      size: 1980
+    params:
+      params.yaml:
+        feature_engineering.max_features: 10000
+        feature_engineering.ngram_range:
+        - 1
+        - 3
+        model_building.learning_rate: 0.09
+        model_building.max_depth: 20
+        model_building.n_estimators: 367
+    outs:
+    - path: models/lgbm_model.pkl
+      hash: md5
+      md5: 84c8a8be736a31fa2ac62c018e8f760b
+      size: 4189270
+    - path: models/tfidf_vectorizer.pkl
+      hash: md5
+      md5: fe6b65afb164e836e4713fbe21bf27ca
+      size: 384115
+  model_evaluation:
+    cmd: python src/models/model_evaluatio.py
+    deps:
+    - path: data/interim/test_processed.csv
+      hash: md5
+      md5: 4f30375397ec89fead1745ee6d70f201
+      size: 1000526
+    - path: models/lgbm_model.pkl
+      hash: md5
+      md5: 84c8a8be736a31fa2ac62c018e8f760b
+      size: 4189270
+    - path: models/tfidf_vectorizer.pkl
+      hash: md5
+      md5: fe6b65afb164e836e4713fbe21bf27ca
+      size: 384115
+    - path: src/models/model_evaluatio.py
+      hash: md5
+      md5: 0b57c452c707fdd73ee98ff640afd10d
+      size: 3792
+    params:
+      params.yaml:
+        mlflow.experiment_name: dvc-pipeline-runs
+        mlflow.tracking_uri: 
+          https://dagshub.com/Aayush10671/yt-comment-sentiment-analysis.mlflow
+    outs:
+    - path: experiment_info.json
+      hash: md5
+      md5: c6df488753b31691d7def3fdfd600b01
+      size: 87
+  model_registration:
+    cmd: python src/models/register_model.py
+    deps:
+    - path: experiment_info.json
+      hash: md5
+      md5: c6df488753b31691d7def3fdfd600b01
+      size: 87
+    - path: src/models/register_model.py
+      hash: md5
+      md5: 12a8aebafcfbad94117c2c9663219b29
+      size: 1753
+    params:
+      params.yaml:
+        mlflow.tracking_uri: 
+          https://dagshub.com/Aayush10671/yt-comment-sentiment-analysis.mlflow

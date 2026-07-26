@@ -6,7 +6,7 @@ import nltk
 import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-import string as str
+import string
 # Logging
 logging.basicConfig(
     level=logging.INFO,
@@ -28,8 +28,8 @@ lemmatizer = WordNetLemmatizer()
 
 def preprocess_comment(comment):
 
-    comment = comment.str.lower()
-    comment = comment.str.strip()
+    comment = comment.lower()
+    comment = comment.strip()
 
     comment = re.sub(r"\n", " ", comment)
     comment = re.sub(r"[^A-Za-z0-9\s!?.,]", "", comment)

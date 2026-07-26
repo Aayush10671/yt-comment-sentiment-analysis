@@ -37,6 +37,9 @@ def main():
         os.path.join(root, "data/interim/train_processed.csv")
     )
 
+    # Remove any remaining NaN values
+    df = df.dropna(subset=["clean_comment"])
+
     X_train_text, X_test_text, y_train, y_test = train_test_split(
         df["clean_comment"],
         df["category"],
@@ -46,8 +49,8 @@ def main():
     )
 
     vectorizer = TfidfVectorizer(
-        max_features=params["model_building"]["max_features"],
-        ngram_range=tuple(params["model_building"]["ngram_range"])
+        max_features=params["feature_engineering"]["max_features"],
+        ngram_range=tuple(params["feature_engineering"]["ngram_range"])
     )
 
     X_train = vectorizer.fit_transform(X_train_text)

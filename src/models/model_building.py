@@ -1,8 +1,11 @@
 import os
 import pickle
-import yaml
 import logging
+import yaml
+import pandas as pd
 import lightgbm as lgb
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -29,13 +32,26 @@ def main():
 
     params = load_params(os.path.join(root, "params.yaml"))
 
-    processed_path = os.path.join(root, "data/processed")
+    train_data = pd.read_csv(
+        os.path.join(root, "data", "interim", "train_processed.csv")
+    )
 
-    with open(os.path.join(processed_path, "X_train.csv"), "rb") as f:
-        X_train = pickle.load(f)
+    # Remove any NaN values
+    train_data = train_data.dropna(subset=["clean_comment"])
 
-    with open(os.path.join(processed_path, "y_train.csv"), "rb") as f:
-        y_train = pickle.load(f)
+    max_features = params["feature_engineering"]["max_features"]
+    ngram_range = tuple(params["feature_engineering"]["ngram_range"])
+
+    vectorizer = TfidfVectorizer(
+        max_features=max_features,
+        ngram_range=ngram_range
+    )
+
+    X_train = vectorizer.fit_transform(
+        train_data["clean_comment"]
+    )
+
+    y_train = train_data["category"]
 
     model = lgb.LGBMClassifier(
         learning_rate=params["model_building"]["learning_rate"],
@@ -48,10 +64,16 @@ def main():
 
     model.fit(X_train, y_train)
 
-    with open(os.path.join(root, "models", "lgbm_model.pkl"), "wb") as f:
+    models_path = os.path.join(root, "models")
+    os.makedirs(models_path, exist_ok=True)
+
+    with open(os.path.join(models_path, "tfidf_vectorizer.pkl"), "wb") as f:
+        pickle.dump(vectorizer, f)
+
+    with open(os.path.join(models_path, "lgbm_model.pkl"), "wb") as f:
         pickle.dump(model, f)
 
-    logger.info("Model training completed successfully.")
+    logger.info("Model and vectorizer saved successfully.")
 
 
 if __name__ == "__main__":
