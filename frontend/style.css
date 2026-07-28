@@ -1,0 +1,42 @@
+body {
+  width: 350px;
+  background: #1e1e1e;
+  color: white;
+  font-family: Arial;
+  padding: 15px;
+}
+
+h2 {
+  color: #00aaff;
+}
+
+.card {
+  background: #333;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+.comment {
+  background: #444;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+img {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.positive {
+  color: #00ff00;
+}
+
+.negative {
+  color: red;
+}
+
+.neutral {
+  color: #aaa;
+}

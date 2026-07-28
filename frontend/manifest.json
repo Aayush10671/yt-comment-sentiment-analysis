@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Sentiment Analyzer",
+  "version": "1.0",
+  "description": "Analyze YouTube comments using AI",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*"
+  ]
+}
